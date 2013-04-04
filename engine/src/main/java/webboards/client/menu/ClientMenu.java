@@ -8,6 +8,7 @@ import org.vectomatic.dom.svg.impl.SVGSVGElement;
 
 import webboards.client.ClientEngine;
 import webboards.client.ClientOpRunner;
+import webboards.client.Menu;
 import webboards.client.data.CounterInfo;
 import webboards.client.data.GameCtx;
 import webboards.client.display.BasicDisplay;
@@ -54,6 +55,10 @@ public class ClientMenu implements ClickHandler {
 	public ClientMenu(SVGSVGElement svg, GameCtx ctx) {
 		this.svg = svg;
 		this.ctx = ctx;
+		Menu menux = new Menu(svg, ctx);
+		menux.ok();
+		GWT.log(""+menux);
+
 		runner = new ClientOpRunner(ctx);
 		root = RootPanel.get("menu");
 		Button menu = add("Show menu");

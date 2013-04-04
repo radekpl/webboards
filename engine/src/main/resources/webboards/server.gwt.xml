@@ -3,6 +3,9 @@
 <module rename-to="webboards">
 	<inherits name="com.google.gwt.user.User" />
 	<inherits name="org.vectomatic.libgwtsvg" />
+	<inherits name="org.eclipse.xtend.lib.Lib"/>
+	<inherits name="org.eclipse.xtext.xbase.lib.Lib"/>
+	<inherits name="com.google.common.collect.Collect"/>
 	<inherits name='no.eirikb.gwtchannelapi.GwtChannelApi' />
 	<source path="client" />
 	<entry-point class="webboards.client.ClientEngine" />

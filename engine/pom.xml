@@ -16,6 +16,7 @@
 
 	<properties>
 		<appid>web-boards</appid>
+		<xtend.version>2.4.1-SNAPSHOT</xtend.version>
 	</properties>
 
 	<dependencies>
@@ -27,10 +28,49 @@
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.xtend</groupId>
-			<artifactId>org.eclipse.xtend.lib</artifactId>
-			<version>2.4.0</version>
+			<artifactId>org.eclipse.xtend.lib.gwt</artifactId>
+			<version>${xtend.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.eclipse.xtext</groupId>
+			<artifactId>org.eclipse.xtext.xbase.lib.gwt</artifactId>
+			<version>${xtend.version}</version>
+		</dependency>
+
 	</dependencies>
+
+	<build>
+		<plugins>
+		<!-- 
+			<plugin>		
+				<groupId>org.eclipse.xtend</groupId>
+				<artifactId>xtend-maven-plugin</artifactId>
+				<version>${xtend.version}</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<outputDirectory>${basedir}/src/main/xtend-gen</outputDirectory>
+				</configuration>
+			</plugin>
+			 -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>gwt-maven-plugin</artifactId>
+				<version>${gwt.mvn.version}</version>
+				<configuration>
+					<compileSourcesArtifacts>
+						<artifact>org.eclipse.xtext:org.eclipse.xtext.xbase.lib</artifact>
+					</compileSourcesArtifacts>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 	<profiles>
 		<profile>
@@ -44,13 +84,14 @@
 						<executions>
 							<execution>
 								<id>add-source</id>
-								<phase>generate-sources</phase>
+								<phase>initialize</phase>
 								<goals>
 									<goal>add-source</goal>
 								</goals>
 								<configuration>
 									<sources>
-										<source>../core/src/main/java</source>
+										<source>${basedir}/../core/src/main/java</source>
+										<source>${basedir}/src/main/xtend-gen</source>
 									</sources>
 								</configuration>
 							</execution>
@@ -94,6 +135,7 @@
 						<configuration>
 							<compileSourcesArtifacts>
 								<artifact>webboards:core</artifact>
+								<artifact>org.eclipse.xtext:org.eclipse.xtext.xbase.lib</artifact>
 							</compileSourcesArtifacts>
 						</configuration>
 					</plugin>
@@ -101,4 +143,17 @@
 			</build>
 		</profile>
 	</profiles>
+
+	<repositories>
+		<repository>
+			<id>xtend</id>
+			<url>http://build.eclipse.org/common/xtend/maven/</url>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>xtend</id>
+			<url>http://build.eclipse.org/common/xtend/maven/</url>
+		</pluginRepository>
+	</pluginRepositories>
 </project>
