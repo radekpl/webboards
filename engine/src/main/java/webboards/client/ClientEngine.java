@@ -205,9 +205,9 @@ public class ClientEngine implements EntryPoint {
 	public static void log(String s) {
 		Browser.console(s);
 		GWT.log(s);
-		if(menu != null) {
-			menu.log(s);
-		}
+//		if(menu != null) {
+//			menu.log(s);
+//		}
 	}
 
 	public static native SVGSVGElement getSVG() /*-{

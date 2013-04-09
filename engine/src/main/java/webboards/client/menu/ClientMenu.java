@@ -8,7 +8,6 @@ import org.vectomatic.dom.svg.impl.SVGSVGElement;
 
 import webboards.client.ClientEngine;
 import webboards.client.ClientOpRunner;
-import webboards.client.Menu;
 import webboards.client.data.CounterInfo;
 import webboards.client.data.GameCtx;
 import webboards.client.display.BasicDisplay;
@@ -47,47 +46,48 @@ public class ClientMenu implements ClickHandler {
 	private final RootPanel root;
 	private Document log = null;
 	private final List<String> logMessages = new ArrayList<String>();
-	private final Button logBtn;
-	private final SVGSVGElement svg;
+	private Button logBtn;
+	private SVGSVGElement svg;
 	private boolean expanded = false;
 	private ClientOpRunner runner;
 
 	public ClientMenu(SVGSVGElement svg, GameCtx ctx) {
 		this.svg = svg;
 		this.ctx = ctx;
-		Menu menux = new Menu(svg, ctx);
-		menux.ok();
-		GWT.log(""+menux);
 
 		runner = new ClientOpRunner(ctx);
 		root = RootPanel.get("menu");
-		Button menu = add("Show menu");
-		menu.setVisible(true);
-		add("Undo Op");
-		add("Next phase");
-		add("Flip");
-		add("Clear traces");
-		add("Send msg");
-		logBtn = add("Show log");
-		add("2d6");
-		add("Toggle units"); 
-		add("Remove unit");
-		add("DG");
-		add("Expand");
-		add("Refresh");
-		add("Verify");
-		add("Generate");
-		
-		RootPanel controls = RootPanel.get("controls");
-		Button back = new Button("&lt;");
-		back.addClickHandler(this);
-		controls.add(back);
-		Button next = new Button("&gt;");
-		next.addClickHandler(this);
-		controls.add(next);	
-		Button end = new Button("&gt;|");
-		end.addClickHandler(this);
-		controls.add(end);	
+		root.add(new Menu(svg, ctx));
+		if (System.currentTimeMillis() == 0) {
+			Button menu = add("Show menu");
+//			menu.setVisible(true);
+			add("Undo Op");
+			add("Next phase");
+			add("Flip");
+			add("Clear traces");
+			add("Send msg");
+			logBtn = add("Show log");
+			add("2d6");
+			add("Toggle units");
+			add("Remove unit");
+			add("DG");
+			add("Expand");
+			add("Refresh");
+			add("Verify");
+			add("Generate");
+
+			RootPanel controls = RootPanel.get("controls");
+			Button back = new Button("&lt;");
+			back.addClickHandler(this);
+			controls.add(back);
+			Button next = new Button("&gt;");
+			next.addClickHandler(this);
+			controls.add(next);
+			Button end = new Button("&gt;|");
+			end.addClickHandler(this);
+			controls.add(end);
+
+		}
 	}
 
 	private Button add(String text) {
@@ -113,7 +113,7 @@ public class ClientMenu implements ClickHandler {
 			removeUnit();
 		} else if ("Send msg".equals(text)) {
 			String msg = Window.prompt("Enter message:", "");
-			if(msg != null) {
+			if (msg != null) {
 				runner.process(new ChatOp(msg));
 			}
 		} else if ("Clear traces".equals(text)) {
@@ -137,32 +137,32 @@ public class ClientMenu implements ClickHandler {
 		} else if ("2d6".equals(text)) {
 			DiceRoll roll = new DiceRoll();
 			try {
-				SerializationStreamFactory f = GWT.create(ServerEngine.class);			
+				SerializationStreamFactory f = GWT.create(ServerEngine.class);
 				SerializationStreamWriter w = f.createStreamWriter();
 				w.writeObject(roll);
 				String s = w.toString();
-				Window.alert("roll:"+s);
+				Window.alert("roll:" + s);
 				SerializationStreamReader r = f.createStreamReader(s);
 				Operation op = (Operation) r.readObject();
 				runner.process(op);
 			} catch (SerializationException e) {
 				Window.alert(e.toString());
-			}			
-//			ctx.process(roll);
+			}
+			// ctx.process(roll);
 		} else if ("Toggle units".equals(text)) {
 			toggleVisible(svg.getElementById("units").getStyle());
 			toggleVisible(svg.getElementById("markers").getStyle());
 		} else if ("Next phase".equals(text)) {
 			nextPhase();
-		}else if("Generate".equals(text)) {
+		} else if ("Generate".equals(text)) {
 			String prompt = Window.prompt("Turns:", "300");
 			int count = Integer.parseInt(prompt);
 			generate(count);
-		}else if("&lt;".equals(text)) {
+		} else if ("&lt;".equals(text)) {
 			back();
-		}else if("&gt;".equals(text)) {
+		} else if ("&gt;".equals(text)) {
 			forward();
-		}else if("&gt;|".equals(text)) {
+		} else if ("&gt;|".equals(text)) {
 			historyIndex = ctx.ops.size();
 		} else {
 			Window.alert("Not implemented yet: " + text);
@@ -170,38 +170,39 @@ public class ClientMenu implements ClickHandler {
 	}
 
 	private void forward() {
-		if(historyIndex == null || historyIndex >= ctx.ops.size())  {
+		if (historyIndex == null || historyIndex >= ctx.ops.size()) {
 			return;
 		}
-		Operation op = ctx.ops.get(historyIndex);			
+		Operation op = ctx.ops.get(historyIndex);
 		op.updateBoard(ctx.board);
 		op.draw(ctx);
-		op.postServer(ctx);			
+		op.postServer(ctx);
 		op.drawDetails(ctx);
-		
+
 		historyIndex++;
 	}
 
 	private Integer historyIndex = null;
-	
+
 	private void back() {
 		ctx.display.clearTraces();
-		ctx.board = ctx.info.game.start(ctx.info.scenario);		
+		ctx.board = ctx.info.game.start(ctx.info.scenario);
 		BasicDisplay display = (BasicDisplay) ctx.display;
-		display.updateBoard(ctx.board);runner = new ClientOpRunner(ctx);
-		if(historyIndex == null) {
+		display.updateBoard(ctx.board);
+		runner = new ClientOpRunner(ctx);
+		if (historyIndex == null) {
 			historyIndex = ctx.ops.size();
-		}else{
+		} else {
 			historyIndex--;
 		}
 		int max = historyIndex;
 		ctx.display.clearTraces();
 		for (int i = 0; i < max; ++i) {
-			Operation op = ctx.ops.get(i);			
+			Operation op = ctx.ops.get(i);
 			op.updateBoard(ctx.board);
 			op.draw(ctx);
-			op.postServer(ctx);			
-			if(i > max-5) {
+			op.postServer(ctx);
+			if (i > max - 5) {
 				op.drawDetails(ctx);
 			}
 		}
@@ -235,28 +236,29 @@ public class ClientMenu implements ClickHandler {
 
 	private void undoOp() {
 		final Operation op = findLastOpToUndo();
-		if(op == null) {
+		if (op == null) {
 			Window.alert("Can't undo any more");
-			return;			
+			return;
 		}
-		Scheduler.get().scheduleFinally(new ScheduledCommand() {			
+		Scheduler.get().scheduleFinally(new ScheduledCommand() {
 			@Override
 			public void execute() {
 				ctx.ops.remove(op);
 				ctx.display.clearTraces();
-				ctx.board = ctx.info.game.start(ctx.info.scenario);		
+				ctx.board = ctx.info.game.start(ctx.info.scenario);
 				BasicDisplay display = (BasicDisplay) ctx.display;
-				display.updateBoard(ctx.board);runner = new ClientOpRunner(ctx);
+				display.updateBoard(ctx.board);
+				runner = new ClientOpRunner(ctx);
 				ClientEngine.update(ctx);
 			}
 		});
 	}
 
 	private Operation findLastOpToUndo() {
-		if(ctx.ops.isEmpty()) {
+		if (ctx.ops.isEmpty()) {
 			return null;
-		}else{
-			return ctx.ops.get(ctx.ops.size()-1);
+		} else {
+			return ctx.ops.get(ctx.ops.size() - 1);
 		}
 	}
 
@@ -283,10 +285,10 @@ public class ClientMenu implements ClickHandler {
 	}
 
 	private static native Document openLogWindow() /*-{
-		var doc = window.open("", "webboards.log", "").document;
-		doc.title = "Game log";
-		return doc;
-	}-*/;
+													var doc = window.open("", "webboards.log", "").document;
+													doc.title = "Game log";
+													return doc;
+													}-*/;
 
 	private void toggleVisible(Style style) {
 		String visibility = style.getVisibility();
@@ -304,18 +306,18 @@ public class ClientMenu implements ClickHandler {
 			w.setVisible(!w.isVisible());
 		}
 	}
-	
+
 	public void generate(int count) {
 		List<CounterInfo> counters = new ArrayList<CounterInfo>(ctx.board.getCounters());
 		for (int i = 0; i < count; ++i) {
-			CounterInfo ci = counters.get((int) (counters.size()*Math.random()));
+			CounterInfo ci = counters.get((int) (counters.size() * Math.random()));
 			int x = (int) (1 + Math.random() * 30);
 			int y = (int) (1 + Math.random() * 30);
-			runner.process(new Move(ci, new Hex(x,y)));
-			if(i % 30 == 0) {
+			runner.process(new Move(ci, new Hex(x, y)));
+			if (i % 30 == 0) {
 				runner.process(new NextPhase());
 			}
 		}
-	} 
+	}
 
 }
