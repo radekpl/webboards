@@ -16,7 +16,7 @@
 
 	<properties>
 		<appid>web-boards</appid>
-		<xtend.version>2.4.1-SNAPSHOT</xtend.version>
+		<xtend.version>2.4.0</xtend.version>
 	</properties>
 
 	<dependencies>
