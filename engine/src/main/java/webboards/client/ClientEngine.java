@@ -14,7 +14,8 @@ import webboards.client.display.svg.edit.EmptyScenario;
 import webboards.client.ex.WebBoardsException;
 import webboards.client.games.scs.bastogne.Bastogne;
 import webboards.client.games.scs.ops.NextPhase;
-import webboards.client.menu.ClientMenu;
+import webboards.client.menu.HistoryControls;
+import webboards.client.menu.Menu;
 import webboards.client.ops.ClearScreen;
 import webboards.client.ops.Operation;
 import webboards.client.remote.ServerEngine;
@@ -34,7 +35,6 @@ import com.google.gwt.user.client.ui.RootPanel;
 public class ClientEngine implements EntryPoint {
 	private SVGSVGElement svg;
 	private ServerEngineAsync service;
-	private static ClientMenu menu;
  
 	@Override
 	public void onModuleLoad() {
@@ -85,7 +85,8 @@ public class ClientEngine implements EntryPoint {
 		ctx.setInfo(info);
 		ctx.board = info.game.start(info.scenario);
 		SVGDisplay display = new SVGDisplay(svg, ctx);
-		menu = new ClientMenu(svg, ctx);
+//		menu = new ClientMenu(svg, ctx);
+		setupControls(ctx);
 		display.setBoard(ctx.board);
 		new NextPhase().draw(ctx);
 
@@ -109,6 +110,12 @@ public class ClientEngine implements EntryPoint {
 			update(ctx);
 		}
 	}
+
+	private void setupControls(GameCtx ctx) {
+		RootPanel.get("menu").add(new Menu(svg, ctx));
+		RootPanel.get("controls").add(new HistoryControls(ctx));		
+	}
+
 
 	public static void update(GameCtx ctx) {
 		int startDetailsFrom = ctx.ops.size()-30;

@@ -57,7 +57,7 @@ public class ClientMenu implements ClickHandler {
 
 		runner = new ClientOpRunner(ctx);
 		root = RootPanel.get("menu");
-		root.add(new Menu(svg, ctx));
+//		root.add(new Menu(svg, ctx));
 		if (System.currentTimeMillis() == 0) {
 			Button menu = add("Show menu");
 //			menu.setVisible(true);
